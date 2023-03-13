@@ -4,7 +4,8 @@ module.exports = {
   content: [
     './src/**/*.{js,jsx,ts,tsx}',
     './pages/**/*.{html,js}',
-    './components/**/*.{html,js}'
+    './components/**/*.{html,js}',
+    './node_modules/flowbite/**/*.js'
   ],
   theme: {
     screens: {
@@ -29,5 +30,7 @@ module.exports = {
       serif: ['Merriweather', 'serif']
     }
   },
-  plugins: []
+  plugins: [
+    require('flowbite/plugin')
+  ]
 }
