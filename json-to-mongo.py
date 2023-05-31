@@ -4,7 +4,7 @@ from pymongo import MongoClient
  
  
 # Making Connection
-myclient = MongoClient("mongodb+srv://SSM-MERN:geM4jnk4gKTpx7v@atlascluster.t5lgcnm.mongodb.net/?retryWrites=true&w=majority")
+myclient = MongoClient("mongodb+srv://")
   
 # database
 db = myclient["ecommerce"]
