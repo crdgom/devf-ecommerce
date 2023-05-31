@@ -1,43 +1,205 @@
-import SearchForm from './SearchForm'
+/* import { NavLink } from 'react-router-dom'
+import { useAuthContext } from '@/context/AuthContext' */
+import { NavLink } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { useAuthContext } from '../context/AuthContext'
 
-export const NavBar = () => {
+// Avtar with darpdown menu
+const NavBar = () => {
+  const { isAuth, logout } = useAuthContext()
+
+  const linkIsActive = (isActive, isPending) => {
+    if (isPending) return 'text-gray-700'
+    if (isActive) return 'border-b-2 border-indigo-600'
+    else return 'text-gray-700'
+  }
+  const [state, setState] = useState(false)
+  const profileRef = useRef()
+
+  const navigation = [
+    { title: 'Dashboard', path: '/dashboard' },
+    { title: 'Profile', path: '/profile' }
+  ]
+
+  useEffect(() => {
+    const handleDropDown = (e) => {
+      if (!profileRef.current.contains(e.target)) setState(false)
+    }
+    document.addEventListener('click', handleDropDown)
+  }, [])
+
   return (
-
-    <nav className='bg-white border-gray-200 px-2 sm:px-4 py-2.5 rounded dark:bg-gray-900'>
-      <div className='container flex flex-wrap items-center justify-between mx-auto'>
-        <a href='#' className='flex items-center'>
-          <img src='' className='h-6 mr-3 sm:h-9' alt='Awesome Store Logo' />
-          <span className='self-center text-xl font-semibold whitespace-nowrap dark:text-white'>Awesome Store</span>
-        </a>
-        <div className='flex md:order-2'>
-          <button data-collapse-toggle='navbar-search' type='button' className='inline-flex items-center p-2 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600' aria-controls='navbar-search' aria-expanded='false'>
-            <span className='sr-only'>Open menu</span>
-            <svg className='w-6 h-6' aria-hidden='true' fill='currentColor' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'><path fillRule='evenodd' d='M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z' clipRule='evenodd' /></svg>
-          </button>
-        </div>
-        <div className='items-center justify-between hidden w-full md:flex md:w-auto md:order-1' id='navbar-search'>
-          <div className='relative mt-3 md:hidden'>
-            <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
-              <svg className='w-5 h-5 text-gray-500' aria-hidden='true' fill='currentColor' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'><path fillRule='evenodd' d='M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z' clipRule='evenodd' /></svg>
+    {isAuth
+      ? ( 
+          <>
+          <div className='relative border-t lg:border-none'>
+            <div className=''>
+              <button
+                ref={profileRef} className='hidden w-10 h-10 outline-none rounded-full ring-offset-2 ring-gray-200 lg:focus:ring-2 lg:block'
+                onClick={() => setState(!state)}
+              >
+                <img
+                  src='https://api.uifaces.co/our-content/donated/xZ4wg2Xj.jpg'
+                  className='w-full h-full rounded-full'
+                />
+              </button>
             </div>
-            <SearchForm />
+            <ul className={`bg-white top-14 right-0 mt-6 space-y-6 lg:absolute lg:border lg:rounded-md lg:w-52 lg:shadow-md lg:space-y-0 lg:mt-0 ${state ? '' : 'lg:hidden'}`}>
+              {
+                          navigation.map((item, idx) => (
+                            <li key={idx}>
+                              <a className='block text-gray-600 hover:text-gray-900 lg:hover:bg-gray-50 lg:p-3' href={item.path}>
+                                {item.title}
+                              </a>
+                            </li>
+                          ))
+                      }
+              <NavLink
+                to='/'
+                className='block w-full text-justify text-gray-600 hover:text-gray-900 border-t py-3 lg:hover:bg-gray-50 lg:p-3'
+                onClick={logout}
+              >Logout
+              </NavLink>
+            </ul>
           </div>
-          <ul className='flex flex-col p-4 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700'>
-            <li>
-              <a href='#' className='block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white' aria-current='page'>Home</a>
-            </li>
-            <li>
-              <a href='#' className='block py-2 pl-3 pr-4 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-white dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700'>About</a>
-            </li>
-            <li>
-              <a href='#' className='block py-2 pl-3 pr-4 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-gray-400 md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700'>Contact</a>
-            </li>
+          </>)
+      : (
+        <div className='relative border-t lg:border-none'>
+          <div className=''>
+            <button
+              ref={profileRef} className='hidden w-10 h-10 outline-none rounded-full ring-offset-2 ring-gray-200 lg:focus:ring-2 lg:block'
+              onClick={() => setState(!state)}
+            >
+              <img
+                src='https://api.uifaces.co/our-content/donated/xZ4wg2Xj.jpg'
+                className='w-full h-full rounded-full'
+              />
+            </button>
+          </div>
+          <ul className={`bg-white top-14 right-0 mt-6 space-y-6 lg:absolute lg:border lg:rounded-md lg:w-52 lg:shadow-md lg:space-y-0 lg:mt-0 ${state ? '' : 'lg:hidden'}`}>
+            {
+                        navigation.map((item, idx) => (
+                          <li key={idx}>
+
+                            <NavLink
+                              to={item.path}
+                              className='block text-gray-600 hover:text-gray-900 lg:hover:bg-gray-50 lg:p-3'
+                              activeClassName='border-b-2 border-indigo-600'
+                            >
+                              {item.title}
+                            </NavLink>
+                          </li>
+                        ))
+                    }
+            <NavLink
+              to='/'
+              className='block w-full text-justify text-gray-600 hover:text-gray-900 border-t py-3 lg:hover:bg-gray-50 lg:p-3'
+              onClick={logout}
+            >Logout
+            </NavLink>
           </ul>
         </div>
-      </div>
-    </nav>
-
+        ))}
   )
 }
 
-export default NavBar
+export default () => {
+  const [state, setState] = useState(false)
+
+  // Replace javascript:void(0) paths with your paths
+  const navigation = [
+    { title: 'Pro version', path: 'javascript:void(0)' },
+    { title: 'Upgrade', path: 'javascript:void(0)' },
+    { title: 'Support', path: 'javascript:void(0)' }
+  ]
+
+  const submenuNav = [
+    { title: 'Overview', path: 'javascript:void(0)' },
+    { title: 'Integration', path: 'javascript:void(0)' },
+    { title: 'Billing', path: 'javascript:void(0)' },
+    { title: 'Transactions', path: 'javascript:void(0)' },
+    { title: 'Plans', path: 'javascript:void(0)' }
+  ]
+
+  return (
+    <header className='text-base lg:text-sm'>
+      <div className={`bg-white items-center gap-x-14 px-4 max-w-screen-xl mx-auto lg:flex lg:px-8 lg:static ${state ? 'h-full fixed inset-x-0' : ''}`}>
+        <div className='flex items-center justify-between py-3 lg:py-5 lg:block'>
+          <a href='javascript:void(0)'>
+            <img
+              src='https://www.floatui.com/logo.svg'
+              width={120}
+              height={50}
+              alt='Float UI logo'
+            />
+          </a>
+          <div className='lg:hidden'>
+            <button
+              className='text-gray-500 hover:text-gray-800'
+              onClick={() => setState(!state)}
+            >
+              {
+                                state
+                                  ? (
+                                    <svg xmlns='http://www.w3.org/2000/svg' className='h-6 w-6' viewBox='0 0 20 20' fill='currentColor'>
+                                      <path fillRule='evenodd' d='M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z' clipRule='evenodd' />
+                                    </svg>
+                                    )
+                                  : (
+                                    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' className='w-6 h-6'>
+                                      <path fillRule='evenodd' d='M3 6.75A.75.75 0 013.75 6h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 6.75zM3 12a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 12zm8.25 5.25a.75.75 0 01.75-.75h8.25a.75.75 0 010 1.5H12a.75.75 0 01-.75-.75z' clipRule='evenodd' />
+                                    </svg>
+
+                                    )
+                            }
+            </button>
+          </div>
+        </div>
+        <div className={`nav-menu flex-1 pb-28 mt-8 overflow-y-auto max-h-screen lg:block lg:overflow-visible lg:pb-0 lg:mt-0 ${state ? '' : 'hidden'}`}>
+          <ul className='items-center space-y-6 lg:flex lg:space-x-6 lg:space-y-0'>
+            <form onSubmit={(e) => e.preventDefault()} className='flex-1 items-center justify-start pb-4 lg:flex lg:pb-0'>
+              <div className='flex items-center gap-1 px-2 border rounded-lg'>
+                <svg xmlns='http://www.w3.org/2000/svg' className='w-6 h-6 text-gray-400' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
+                </svg>
+                <input
+                  type='text'
+                  placeholder='Search'
+                  className='w-full px-2 py-2 text-gray-500 bg-transparent rounded-md outline-none'
+                />
+              </div>
+            </form>
+            {
+                            navigation.map((item, idx) => {
+                              return (
+                                <li key={idx}>
+                                  <a href={item.path} className='block text-gray-700 hover:text-gray-900'>
+                                    {item.title}
+                                  </a>
+                                </li>
+                              )
+                            })
+                        }
+            <NavBar />
+          </ul>
+        </div>
+      </div>
+      <nav className='border-b'>
+        <ul className='flex items-center gap-x-3 max-w-screen-xl mx-auto px-4 overflow-x-auto lg:px-8'>
+          {
+                        submenuNav.map((item, idx) => {
+                          return (
+                          // Replace [idx == 0] with [window.location.pathname == item.path]
+                            <li key={idx} className={`py-1 ${idx === 0 ? 'border-b-2 border-indigo-600' : ''}`}>
+                              <a href={item.path} className='block py-2 px-3 rounded-lg text-gray-700 hover:text-gray-900 hover:bg-gray-100 duration-150'>
+                                {item.title}
+                              </a>
+                            </li>
+                          )
+                        })
+                    }
+        </ul>
+      </nav>
+    </header>
+  )
+}

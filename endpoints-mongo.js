@@ -60,7 +60,33 @@ exports = function ({ query, headers, body }, response) {
   return result
 }
 
-// * Funcion para devolver datos del usuario logueado basado en el email y borrar tosos los datos dejando solo el password y el email
+// * Funcion para devolver un jwt con el rol del usuario logueado en mongo utilizando el email y el password y las dependencias de utils.jwt.encode y una función secret
+
+exports = function ({ query, headers, body }, response) {
+  const { email, password } = JSON.parse(body.text())
+  const result = context.services
+    .get('mongodb-atlas')
+    .db('ecommerce')
+    .collection('users')
+    .findOne({ email: email, password: password })
+    .then(user => {
+      if (user) {
+        const signingMethod = "HS512";
+        const secret = '2cc710f2d23a07a0e6b950ed537ca17a26d392df201e772560d53d33287185bc07a6a5005afff06680b9d6e819dd73b223677853300e9318b15b6e110011ac51'
+        const payload = {
+          email: user.email,
+          role: user.role,
+          iat: new Date().getTime(),
+          exp: new Date().setDate(new Date().getDate() + 30) // 30 dias
+        }
+        const token = utils.jwt.encode(payload, secret, signingMethod)
+        return { success: true, token: token }
+      } else {
+        return { success: false, message: 'Invalid credentials' }
+      }
+    })
+  return result
+}
 
 
 
